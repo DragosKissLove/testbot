@@ -202,13 +202,6 @@ echo [SC] ChangeServiceConfig SUCCESS
 echo HomeGroup Services disabled successfully.
 timeout 1 > nul
 
-cls
-color D
-echo (CTT) Disabling Unnecessary WiFi Settings...
-reg add "HKLM\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting" /v "Value" /t REG_DWORD /d 0 /f
-reg add "HKLM\Software\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots" /v "Value" /t REG_DWORD /d 0 /f
-echo Unnecessary WiFi Settings disabled successfully.
-timeout 1 > nul
 
 cls
 color D
