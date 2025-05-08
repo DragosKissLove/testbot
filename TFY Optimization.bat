@@ -236,7 +236,6 @@ sc config CDPUserSvc_dc2a4 start=auto >nul 2>&1
 sc config COMSysApp start=demand
 sc config CaptureService_dc2a4 start=demand >nul 2>&1 
 sc config CertPropSvc start=demand
-sc config ClipSVC start=demand >nul 2>&1 
 sc config ConsentUxUserSvc_dc2a4 start=demand >nul 2>&1 
 sc config CoreMessagingRegistrar start=auto >nul 2>&1 
 sc config CredentialEnrollmentManagerUserSvc_dc2a4 start=demand >nul 2>&1 
