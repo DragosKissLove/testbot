@@ -1,4 +1,5 @@
 {
-  "version-3c1b78b767674c66": "Description or tag 1",
-  "version-6552be68b05d41a5": "Description or tag 2",
+  "version-3c1b78b767674c66": "Latest stable",
+  "version-6552be68b05d41a5": "Previous stable",
+  "version-abc123": "Custom test version"
 }
