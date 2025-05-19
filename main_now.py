@@ -5,6 +5,9 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QFont, QPixmap, QIcon, QStandardItemModel, QStandardItem
 from PyQt6.QtCore import Qt, QSize, QThread, pyqtSignal, QObject
 from utils import install_spicetify_from_github
+from utils import check_for_updates
+from tkinter import Button, Label,Frame
+from tkinter.ttk import Button, Label
 import sys
 import os
 import urllib.request
@@ -260,13 +263,17 @@ class TFYTool(QWidget):
                 extratabs.addTab(roblox_tab, "Roblox Downgrade")
                 layout.addWidget(extratabs)
             elif name == "Settings":
-                settings_text = QLabel("⚙️ Settings")
-                settings_text.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
-                layout.addWidget(settings_text)
-                layout.addWidget(QLabel("- No settings available yet. Future features may include:"))
-                layout.addWidget(QLabel("  * Dark/Light Theme toggle"))
-                layout.addWidget(QLabel("  * Custom paths"))
-                layout.addWidget(QLabel("  * Language selection"))
+              settings_title = QLabel("⚙️ Settings")
+              settings_title.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
+              layout.addWidget(settings_title)
+
+              check_update_btn = QPushButton("🔄 Check for Updates")
+              check_update_btn.setStyleSheet(self.section_button_style())
+              check_update_btn.clicked.connect(check_for_updates)
+              layout.addWidget(check_update_btn)
+
+
+
 
             elif name == "About":
                 about_text = QLabel("📘 About")
