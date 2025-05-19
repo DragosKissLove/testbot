@@ -7,7 +7,7 @@ $spicetifyPath = "$env:LOCALAPPDATA\spicetify"
 if (-not (Test-Path $spicetifyPath)) {
     Write-Host "Spicetify not found."
     Write-Host "Installing it for you..."
-    Invoke-WebRequest -Uri "https://github.com/spicetify/spicetify-cli/releases/latest/download/spicetify-cli-windows.zip" -OutFile "$env:TEMP\spicetify-cli.zip"
+    Invoke-WebRequest -Uri "https://github.com/spicetify/spicetify-cli/releases/latest/download/spicetify-windows-x64.zip" -OutFile "$env:TEMP\\spicetify-cli.zip"
     Expand-Archive -Path "$env:TEMP\spicetify-cli.zip" -DestinationPath $spicetifyPath -Force
     $env:PATH += ";$spicetifyPath"
 }
