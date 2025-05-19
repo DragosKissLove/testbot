@@ -7,6 +7,23 @@ import tempfile
 import webbrowser
 from tkinter import messagebox
 import yt_dlp
+from pathlib import Path
+import io
+
+apps = {
+    # (restul aplicațiilor rămâne neschimbat)
+}
+
+import os
+import subprocess
+import urllib.request
+import requests
+import zipfile
+import tempfile
+import webbrowser
+from tkinter import messagebox
+from pathlib import Path
+import io
 
 apps = {
     "Discord": "https://dl.discordapp.net/distro/app/stable/win/x86/1.0.9014/DiscordSetup.exe",
@@ -21,33 +38,44 @@ apps = {
     "qBittorrent": "https://sourceforge.net/projects/qbittorrent/files/latest/download"
 }
 
-def download_and_run(url, name):
+def download_and_run(url, name, progress_callback=None):
     try:
         path = os.path.join(tempfile.gettempdir(), f"{name}.exe")
-        urllib.request.urlretrieve(url, path)
+
+        def reporthook(block_num, block_size, total_size):
+            if progress_callback and total_size > 0:
+                downloaded = block_num * block_size
+                percent = min(100, int(downloaded * 100 / total_size))
+                progress_callback(percent)
+
+        urllib.request.urlretrieve(url, path, reporthook)
         subprocess.Popen(path, shell=True)
     except Exception as e:
         messagebox.showerror("Download Error", str(e))
 
 def clean_temp():
     try:
-        os.system("del /s /f /q %temp%\*")
-        os.system("del /s /f /q C:\Windows\Temp\*")
+        messagebox.showinfo("Temp Cleaner", "Cleaning temporary files...")
+        os.system("del /s /f /q %temp%\\*")
+        os.system("del /s /f /q C:\\Windows\\Temp\\*")
         messagebox.showinfo("Temp Cleaner", "Temporary files cleaned!")
     except Exception as e:
         messagebox.showerror("Temp Cleaner Error", str(e))
 
 def run_optimization():
     try:
+        messagebox.showinfo("Optimization", "Starting optimization... This may take a moment.")
         url = "https://raw.githubusercontent.com/DragosKissLove/testbot/main/TFY%20Optimization.bat"
         path = os.path.join(tempfile.gettempdir(), "TFY_Optimization.bat")
         urllib.request.urlretrieve(url, path)
-        subprocess.run(["powershell", "-Command", f'Start-Process "{path}" -Verb RunAs'], shell=True)
+        subprocess.run(["powershell", "-Command", f'Start-Process \"{path}\" -Verb RunAs'], shell=True)
+        messagebox.showinfo("Optimization", "Optimization completed!")
     except Exception as e:
         messagebox.showerror("Optimization Error", str(e))
 
 def activate_windows():
     try:
+        messagebox.showinfo("Activation", "Starting activation process...")
         os.system('powershell -Command "irm https://get.activated.win | iex"')
         messagebox.showinfo("Activation", "Activation process started.")
     except Exception as e:
@@ -57,7 +85,7 @@ def winrar_crack():
     try:
         url = "https://github.com/jtlw99/crack-winrar/releases/download/v1/rarreg.key"
         r = requests.get(url)
-        for path in ["C:\Program Files\WinRAR\rarreg.key", "C:\Program Files (x86)\WinRAR\rarreg.key"]:
+        for path in ["C:\\Program Files\\WinRAR\\rarreg.key", "C:\\Program Files (x86)\\WinRAR\\rarreg.key"]:
             try:
                 with open(path, "wb") as f:
                     f.write(r.content)
@@ -71,6 +99,7 @@ def winrar_crack():
 
 def install_atlas_tools():
     try:
+        messagebox.showinfo("Atlas Tools", "Downloading Atlas OS Tools. Please wait...")
         download_folder = os.path.join(os.path.expanduser("~"), "Downloads")
         os.makedirs(download_folder, exist_ok=True)
         atlas_url = "https://github.com/Atlas-OS/Atlas/releases/download/0.4.1/AtlasPlaybook_v0.4.1.apbx"
@@ -91,25 +120,6 @@ def install_atlas_tools():
     except Exception as e:
         messagebox.showerror("Atlas OS Tools Error", str(e))
 
-def youtube_downloader():
-    import tkinter.simpledialog as sd
-    try:
-        url = sd.askstring("YouTube", "Enter YouTube URL:")
-        if not url: return
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'outtmpl': os.path.expanduser('~/Downloads/%(title)s.%(ext)s'),
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-        messagebox.showinfo("Success", "Download complete.")
-    except Exception as e:
-        messagebox.showerror("Error", str(e))
 
 def wifi_passwords():
     try:
@@ -134,3 +144,142 @@ def wifi_passwords():
 
 def open_discord():
     webbrowser.open("https://discord.gg/tfyexe")
+
+
+# =========== NOU =========== #
+def download_roblox_player(version_hash, log_callback, progress_callback):
+    try:
+        base_url = "https://setup.rbxcdn.com"
+        version_hash = version_hash.strip().lower()
+        if not version_hash.startswith("version-"):
+            version_hash = f"version-{version_hash}"
+
+        manifest_url = f"{base_url}/{version_hash}-rbxPkgManifest.txt"
+        log_callback(f"Fetching manifest: {manifest_url}")
+        resp = requests.get(manifest_url, timeout=30)
+        resp.raise_for_status()
+
+        lines = [ln.strip() for ln in resp.text.splitlines() if ln.strip().endswith(".zip")]
+
+        target_root = Path(r"C:\Program Files (x86)\Roblox\Versions") / version_hash
+        target_root.mkdir(parents=True, exist_ok=True)
+        log_callback(f"Created folder: {target_root}")
+
+        xml = '<?xml version="1.0" encoding="UTF-8"?><Settings><ContentFolder>content</ContentFolder><BaseUrl>http://www.roblox.com</BaseUrl></Settings>'
+        (target_root / "AppSettings.xml").write_text(xml, encoding="utf-8")
+
+        extract_roots = {
+            "RobloxApp.zip": "",
+            "redist.zip": "",
+            "shaders.zip": "shaders/",
+            "ssl.zip": "ssl/",
+            "WebView2.zip": "",
+            "WebView2RuntimeInstaller.zip": "WebView2RuntimeInstaller/",
+            "content-avatar.zip": "content/avatar/",
+            "content-configs.zip": "content/configs/",
+            "content-fonts.zip": "content/fonts/",
+            "content-sky.zip": "content/sky/",
+            "content-sounds.zip": "content/sounds/",
+            "content-textures2.zip": "content/textures/",
+            "content-models.zip": "content/models/",
+            "content-platform-fonts.zip": "PlatformContent/pc/fonts/",
+            "content-platform-dictionaries.zip": "PlatformContent/pc/shared_compression_dictionaries/",
+            "content-terrain.zip": "PlatformContent/pc/terrain/",
+            "content-textures3.zip": "PlatformContent/pc/textures/",
+            "extracontent-luapackages.zip": "ExtraContent/LuaPackages/",
+            "extracontent-translations.zip": "ExtraContent/translations/",
+            "extracontent-models.zip": "ExtraContent/models/",
+            "extracontent-textures.zip": "ExtraContent/textures/",
+            "extracontent-places.zip": "ExtraContent/places/"
+        }
+
+        for name in lines:
+            blob_url = f"{base_url}/{version_hash}-{name}"
+            log_callback(f"Downloading {name}")
+            bresp = requests.get(blob_url, stream=True, timeout=60)
+            bresp.raise_for_status()
+
+            total = int(bresp.headers.get("Content-Length", 0))
+            progress_callback("set_max", total)
+            downloaded = 0
+            import io
+            buffer = io.BytesIO()
+
+            for chunk in bresp.iter_content(64 * 1024):
+                if not chunk:
+                    break
+                buffer.write(chunk)
+                downloaded += len(chunk)
+                progress_callback("progress", downloaded)
+
+            buffer.seek(0)
+            log_callback(f"Extracting {name}")
+            with zipfile.ZipFile(buffer) as zin:
+                root = extract_roots.get(name, "")
+                for zi in zin.infolist():
+                    if zi.is_dir():
+                        continue
+                    target = target_root / root / zi.filename.replace("\\", "/")
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    with open(target, "wb") as f:
+                        f.write(zin.read(zi.filename))
+
+            log_callback(f"{name} done")
+            progress_callback("reset", 0)
+
+        log_callback("✅ All files extracted successfully!")
+
+    except Exception as ex:
+        log_callback(f"❌ Error: {ex}")
+# ============================ #
+
+# Restul funcțiilor tale (download_and_run, clean_temp etc.) rămân la fel
+
+def install_spicetify_from_github():
+    subprocess.run([
+        "powershell",
+        "-ExecutionPolicy", "Bypass",
+        "-Command",
+        "iwr -useb https://raw.githubusercontent.com/DragosKissLove/testbot/main/install_spicetify_auto.ps1 | iex"
+    ], shell=True)
+
+
+def check_for_updates():
+    import requests
+    from tkinter import messagebox
+    import os
+    from pathlib import Path
+
+    # Versiunea actuală a tool-ului (manuală)
+    current_version = "3.0.1"
+
+    # Link către tfy_info.json de pe GitHub
+    info_url = "https://raw.githubusercontent.com/DragosKissLove/testbot/main/tfy_info.json"
+
+    try:
+        response = requests.get(info_url)
+        if response.status_code != 200:
+            messagebox.showerror("Update", "Nu s-a putut obține informația despre versiune.")
+            return
+
+        data = response.json()
+        latest_version = data["version"]
+        changelog = data.get("changelog", "")
+        download_url = data["download_url"]
+
+        if latest_version > current_version:
+            confirm = messagebox.askyesno(
+                "Update disponibil",
+                f"A apărut versiunea {latest_version}.\n\nChangelog:\n{changelog}\n\nVrei să o descarci acum?"
+            )
+            if confirm:
+                # Suprascrie fișierul principal local
+                new_code = requests.get(download_url).text
+                local_path = Path(__file__).resolve().parent / "main now2.py"
+                with open(local_path, "w", encoding="utf-8") as f:
+                    f.write(new_code)
+                messagebox.showinfo("Actualizat", "TFY Tool a fost actualizat. Repornește aplicația.")
+        else:
+            messagebox.showinfo("TFY Tool", "Ai deja ultima versiune.")
+    except Exception as e:
+        messagebox.showerror("Eroare update", str(e))
