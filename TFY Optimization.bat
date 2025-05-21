@@ -885,17 +885,6 @@ sc config vmicvss start=disabled
 echo Hyper-V Services disabled successfully.
 timeout 1 > nul
 
-cls
-color D
-echo (Quaked) Disabling Browsers Services...
-sc config edgeupdate start=disabled >nul 2>&1
-sc config edgeupdatem start=disabled >nul 2>&1
-sc config GoogleChromeElevationService start=disabled >nul 2>&1
-sc config gupdate start=disabled >nul 2>&1
-sc config gupdatem start=disabled >nul 2>&1
-sc config BraveElevationService start=disabled >nul 2>&1
-sc config brave start=disabled >nul 2>&1
-sc config bravem start=disabled >nul 2>&1
 
 cls
 color 9
