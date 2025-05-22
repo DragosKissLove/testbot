@@ -6,7 +6,6 @@ import zipfile
 import tempfile
 import webbrowser
 from tkinter import messagebox
-import yt_dlp
 from pathlib import Path
 import io
 
@@ -50,17 +49,20 @@ def download_and_run(url, name, progress_callback=None):
 
         urllib.request.urlretrieve(url, path, reporthook)
         subprocess.Popen(path, shell=True)
+        tfy_notify(f"📦 {name}", f"{name} s-a instalat / lansat.")
     except Exception as e:
         messagebox.showerror("Download Error", str(e))
 
 def clean_temp():
     try:
-        messagebox.showinfo("Temp Cleaner", "Cleaning temporary files...")
         os.system("del /s /f /q %temp%\\*")
         os.system("del /s /f /q C:\\Windows\\Temp\\*")
         messagebox.showinfo("Temp Cleaner", "Temporary files cleaned!")
+        tfy_notify("🧹 TFY Tool", "Temporary files cleaned successfully.")
     except Exception as e:
         messagebox.showerror("Temp Cleaner Error", str(e))
+        tfy_notify("❌ TFY Tool", f"Temp clean failed:\n{e}")
+
 
 def run_optimization():
     try:
@@ -72,6 +74,9 @@ def run_optimization():
         messagebox.showinfo("Optimization", "Optimization completed!")
     except Exception as e:
         messagebox.showerror("Optimization Error", str(e))
+        tfy_notify("⚙️ Optimization", "✔️ Optimizarea s-a finalizat!")
+    except Exception as e:
+        tfy_notify("❌ Optimization", f"Eroare:\n{e}")
 
 def activate_windows():
     try:
@@ -144,6 +149,7 @@ def wifi_passwords():
 
 def open_discord():
     webbrowser.open("https://discord.gg/tfyexe")
+    tfy_notify("🔗 TFY Tool", "Discord s-a deschis!")
 
 
 # =========== NOU =========== #
@@ -236,30 +242,67 @@ def download_roblox_player(version_hash, log_callback, progress_callback):
 # Restul funcțiilor tale (download_and_run, clean_temp etc.) rămân la fel
 
 def install_spicetify_from_github():
-    subprocess.run([
-        "powershell",
-        "-ExecutionPolicy", "Bypass",
-        "-Command",
-        "iwr -useb https://raw.githubusercontent.com/DragosKissLove/testbot/main/install_spicetify_auto.ps1 | iex"
-    ], shell=True)
+    try:
+        subprocess.run([
+            "powershell",
+            "-ExecutionPolicy", "Bypass",
+            "-Command",
+            "iwr -useb https://raw.githubusercontent.com/DragosKissLove/testbot/main/install_spicetify_auto.ps1 | iex"
+        ], shell=True)
+        tfy_notify("🎵 Spotify Modded", "✔️ Spicetify + Marketplace instalate cu succes!")
+    except Exception as e:
+        tfy_notify("❌ Spotify Modded", f"Eroare la instalare:\n{e}")
+
+
+import threading
+
+def check_for_updates():
+    import requests
+    import subprocess
+    import tempfile
+    import os
+    from tkinter import messagebox, Toplevel, Label
+    from pathlib import Path
+
+    current_version = "3.0.0"
+    info_url = "https://raw.githubusercontent.com/DragosKissLove/testbot/main/tfy_info.json"
+
+def download_and_launch(download_url, latest_version):
+    try:
+        from tkinter import messagebox
+        import requests
+        import subprocess
+        import tempfile
+        import os
+        from pathlib import Path
+
+        messagebox.showinfo(" Update", " Se descarcă update-ul... (apasa ok!)")
+
+        temp_dir = Path(tempfile.gettempdir())
+        exe_path = temp_dir / f"TFYTool_{latest_version}.exe"
+
+        with open(exe_path, "wb") as f:
+            f.write(requests.get(download_url).content)
+
+        messagebox.showinfo(" Update complet", "✔️ Noua versiune a fost descărcată!\nTFY Tool se va relansa.")
+        subprocess.Popen([str(exe_path)], shell=True)
+        os._exit(0)
+    except Exception as e:
+        messagebox.showerror("❌ Eroare", f"Update-ul a eșuat:\n{e}")
 
 
 def check_for_updates():
     import requests
+    import threading
     from tkinter import messagebox
-    import os
-    from pathlib import Path
 
-    # Versiunea actuală a tool-ului (manuală)
-    current_version = "3.0.1"
-
-    # Link către tfy_info.json de pe GitHub
+    current_version = "3.0.0"
     info_url = "https://raw.githubusercontent.com/DragosKissLove/testbot/main/tfy_info.json"
 
     try:
         response = requests.get(info_url)
         if response.status_code != 200:
-            messagebox.showerror("Update", "Nu s-a putut obține informația despre versiune.")
+            messagebox.showerror("Update", "💀 N-am putut verifica versiunea online.")
             return
 
         data = response.json()
@@ -269,17 +312,31 @@ def check_for_updates():
 
         if latest_version > current_version:
             confirm = messagebox.askyesno(
-                "Update disponibil",
-                f"A apărut versiunea {latest_version}.\n\nChangelog:\n{changelog}\n\nVrei să o descarci acum?"
+                "🔔 Update disponibil!",
+                f"🚀 TFY Tool {latest_version} este gata de descărcat!\n\n📜 Noutăți:\n{changelog}\n\nVrei să faci update acum?"
             )
             if confirm:
-                # Suprascrie fișierul principal local
-                new_code = requests.get(download_url).text
-                local_path = Path(__file__).resolve().parent / "main now2.py"
-                with open(local_path, "w", encoding="utf-8") as f:
-                    f.write(new_code)
-                messagebox.showinfo("Actualizat", "TFY Tool a fost actualizat. Repornește aplicația.")
+                threading.Thread(
+                    target=download_and_launch,
+                    args=(download_url, latest_version),
+                    daemon=True
+                ).start()
         else:
-            messagebox.showinfo("TFY Tool", "Ai deja ultima versiune.")
+            messagebox.showinfo("👌 Ești la zi", "📦 Ai deja cea mai recentă versiune de TFY Tool.")
     except Exception as e:
         messagebox.showerror("Eroare update", str(e))
+
+
+
+from plyer import notification
+
+def tfy_notify(title: str, message: str, timeout: int = 5):
+    try:
+        notification.notify(
+            title=title,
+            message=message,
+            app_name="TFY Tool",
+            timeout=timeout  # secunde
+        )
+    except Exception as e:
+        print(f"[Notificare eșuată] {e}")
