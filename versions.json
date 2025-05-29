@@ -1,4 +1,10 @@
-{
-  "version-e00a4ca39fb04359": "Latest stable",
-  "version-1ae53095a115415d": "Previous stable",
-}
+[
+  {
+    "version": "June 2024",
+    "hash": "version-e00a4ca39fb04359"
+  },
+  {
+    "version": "May 2024",
+    "hash": "version-1ae53095a115415d"
+  }
+]
